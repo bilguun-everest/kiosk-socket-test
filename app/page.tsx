@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import { socket } from '@/socket';
-import { sendCommand } from '@/services/socketService';
+import { createRequestId, sendCommand } from '@/services/socketService';
 
 export default function Page() {
   const [command, setCommand] = useState('KIOSK_ID_GET');
@@ -54,17 +54,22 @@ export default function Page() {
       log('BAD JSON', e.message);
       return;
     }
+    const request_id = createRequestId();
     const t0 = Date.now();
-    log(`sendCommand ${command} listen=${listen}`, data);
+    log(`sendCommand ${command} listen=${listen} id=${request_id}`, data);
     try {
       const res = await sendCommand({
+        request_id,
         command,
         data,
         isListenResponse: listen,
       });
-      log(`RESOLVED ${Date.now() - t0}ms`, res);
+      log(`RESOLVED ${Date.now() - t0}ms id=${request_id}`, res);
     } catch (e: any) {
-      log(`REJECTED ${Date.now() - t0}ms`, e?.message ?? String(e));
+      log(
+        `REJECTED ${Date.now() - t0}ms id=${request_id}`,
+        e?.message ?? String(e)
+      );
     }
   }
 

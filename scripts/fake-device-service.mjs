@@ -51,6 +51,9 @@ socket.on('toDeviceService', (msg) => {
     command: msg.command,
     intResult: 0,
     data: CANNED[msg.command] ?? { ok: true },
+    // Echo the correlation id back so sendCommand can match this reply to the
+    // request that caused it. The real .NET service has to do the same.
+    ...(msg.request_id === undefined ? {} : { request_id: msg.request_id }),
   };
 
   // HELLO must come back or sendCommand rejects with KioskServiceNoResponse.
